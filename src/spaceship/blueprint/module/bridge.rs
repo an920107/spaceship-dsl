@@ -18,52 +18,40 @@ impl CommandBridge {
     }
 }
 
-pub trait Bridge {
-    fn get_type(&self) -> &'static str;
+pub trait BridgeConstraint {}
 
-    fn get_slot_cost(&self) -> i32 {
-        1
-    }
+impl BridgeConstraint for ExplorerBridge {}
 
-    fn get_mass(&self) -> i32;
+impl BridgeConstraint for CommandBridge {}
 
-    fn get_power_draw(&self) -> i32 {
-        75
-    }
-}
-
-impl Bridge for ExplorerBridge {
-    fn get_type(&self) -> &'static str {
-        "Explorer"
-    }
-
-    fn get_mass(&self) -> i32 {
-        50
-    }
-}
-
-impl Bridge for CommandBridge {
-    fn get_type(&self) -> &'static str {
-        "Command"
-    }
-
-    fn get_mass(&self) -> i32 {
-        60
-    }
-}
-
-pub enum BridgeType {
+pub enum Bridge {
     Explorer(ExplorerBridge),
     Command(CommandBridge),
 }
 
-impl Into<BridgeType> for ExplorerBridge {
-    fn into(self) -> BridgeType {
-        BridgeType::Explorer(self)
+impl Into<Bridge> for ExplorerBridge {
+    fn into(self) -> Bridge {
+        Bridge::Explorer(self)
     }
 }
-impl Into<BridgeType> for CommandBridge {
-    fn into(self) -> BridgeType {
-        BridgeType::Command(self)
+impl Into<Bridge> for CommandBridge {
+    fn into(self) -> Bridge {
+        Bridge::Command(self)
+    }
+}
+
+impl Bridge {
+    pub fn get_mass(&self) -> i32 {
+        match self {
+            Bridge::Explorer(_) => 50,
+            Bridge::Command(_) => 60,
+        }
+    }
+
+    pub fn get_power_draw(&self) -> i32 {
+        match self {
+            Bridge::Explorer(_) => 75,
+            Bridge::Command(_) => 75,
+        }
     }
 }

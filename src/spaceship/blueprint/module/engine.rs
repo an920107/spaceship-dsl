@@ -18,63 +18,48 @@ impl PlasmaEngine {
     }
 }
 
-pub trait Engine {
-    fn get_type(&self) -> &'static str;
+pub trait EngineConstraint {}
 
-    fn get_slot_cost(&self) -> i32 {
-        2
-    }
+impl EngineConstraint for IonEngine {}
 
-    fn get_mass(&self) -> i32;
+impl EngineConstraint for PlasmaEngine {}
 
-    fn get_power_draw(&self) -> i32 {
-        250
-    }
-
-    fn get_thrust(&self) -> i32;
-}
-
-impl Engine for IonEngine {
-    fn get_type(&self) -> &'static str {
-        "Ion"
-    }
-
-    fn get_mass(&self) -> i32 {
-        100
-    }
-
-    fn get_thrust(&self) -> i32 {
-        500
-    }
-}
-
-impl Engine for PlasmaEngine {
-    fn get_type(&self) -> &'static str {
-        "Plasma"
-    }
-
-    fn get_mass(&self) -> i32 {
-        120
-    }
-
-    fn get_thrust(&self) -> i32 {
-        750
-    }
-}
-
-pub enum EngineType {
+pub enum Engine {
     Ion(IonEngine),
     Plasma(PlasmaEngine),
 }
 
-impl From<IonEngine> for EngineType {
+impl From<IonEngine> for Engine {
     fn from(engine: IonEngine) -> Self {
-        EngineType::Ion(engine)
+        Engine::Ion(engine)
     }
 }
 
-impl From<PlasmaEngine> for EngineType {
+impl From<PlasmaEngine> for Engine {
     fn from(engine: PlasmaEngine) -> Self {
-        EngineType::Plasma(engine)
+        Engine::Plasma(engine)
+    }
+}
+
+impl Engine {
+    pub fn get_mass(&self) -> i32 {
+        match self {
+            Engine::Ion(_) => 100,
+            Engine::Plasma(_) => 120,
+        }
+    }
+
+    pub fn get_power_draw(&self) -> i32 {
+        match self {
+            Engine::Ion(_) => 250,
+            Engine::Plasma(_) => 250,
+        }
+    }
+
+    pub fn get_thrust(&self) -> i32 {
+        match self {
+            Engine::Ion(_) => 500,
+            Engine::Plasma(_) => 750,
+        }
     }
 }

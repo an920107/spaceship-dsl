@@ -20,47 +20,41 @@ impl PhaseShield {
     }
 }
 
-pub trait Shield<FR: HasModule, AR: HasModule> {
-    fn get_type(&self) -> &'static str;
+pub trait ShieldConstraint<FR: HasModule, AR: HasModule> {}
 
-    fn get_slot_cost(&self) -> i32 {
-        1
-    }
+impl<FR: HasModule> ShieldConstraint<FR, No> for MagneticShield {}
 
-    fn get_mass(&self) -> i32 {
-        40
-    }
+impl<AR: HasModule> ShieldConstraint<No, AR> for PhaseShield {}
 
-    fn get_power_draw(&self) -> i32 {
-        100
-    }
-}
-
-impl<FR: HasModule> Shield<FR, No> for MagneticShield {
-    fn get_type(&self) -> &'static str {
-        "Magnetic"
-    }
-}
-
-impl<AR: HasModule> Shield<No, AR> for PhaseShield {
-    fn get_type(&self) -> &'static str {
-        "Phase"
-    }
-}
-
-pub enum ShieldType {
+pub enum Shield {
     Magnetic(MagneticShield),
     Phase(PhaseShield),
 }
 
-impl Into<ShieldType> for MagneticShield {
-    fn into(self) -> ShieldType {
-        ShieldType::Magnetic(self)
+impl Into<Shield> for MagneticShield {
+    fn into(self) -> Shield {
+        Shield::Magnetic(self)
     }
 }
 
-impl Into<ShieldType> for PhaseShield {
-    fn into(self) -> ShieldType {
-        ShieldType::Phase(self)
+impl Into<Shield> for PhaseShield {
+    fn into(self) -> Shield {
+        Shield::Phase(self)
+    }
+}
+
+impl Shield {
+    pub fn get_mass(&self) -> i32 {
+        match self {
+            Shield::Magnetic(_) => 40,
+            Shield::Phase(_) => 30,
+        }
+    }
+
+    pub fn get_power_draw(&self) -> i32 {
+        match self {
+            Shield::Magnetic(_) => 100,
+            Shield::Phase(_) => 120,
+        }
     }
 }

@@ -20,59 +20,53 @@ impl AntimatterReactor {
     }
 }
 
-pub trait Reactor<const N: usize, FR: HasModule, AR: HasModule> {
+pub trait ReactorConstraint<const N: usize, FR: HasModule, AR: HasModule> {
     type NewFR: HasModule;
     type NewAR: HasModule;
-
-    fn get_type(&self) -> &'static str;
-
-    fn get_mass(&self) -> i32;
-
-    fn get_power_output(&self) -> i32 {
-        1000
-    }
 }
 
-impl<const N: usize, FR: HasModule, AR: HasModule> Reactor<N, FR, AR> for FusionReactor {
+impl<const N: usize, FR: HasModule, AR: HasModule> ReactorConstraint<N, FR, AR> for FusionReactor {
     type NewFR = Yes;
     type NewAR = AR;
-
-    fn get_type(&self) -> &'static str {
-        "Fusion"
-    }
-
-    fn get_mass(&self) -> i32 {
-        300
-    }
 }
 
-impl<const N: usize, FR: HasModule, AR: HasModule> Reactor<N, FR, AR> for AntimatterReactor {
+impl<const N: usize, FR: HasModule, AR: HasModule> ReactorConstraint<N, FR, AR>
+    for AntimatterReactor
+{
     type NewFR = FR;
     type NewAR = Yes;
-
-    fn get_type(&self) -> &'static str {
-        "Antimatter"
-    }
-
-    fn get_mass(&self) -> i32 {
-        450
-    }
 }
 
 #[derive(Clone, Copy)]
-pub enum ReactorType {
+pub enum Reactor {
     Fusion(FusionReactor),
     Antimatter(AntimatterReactor),
 }
 
-impl Into<ReactorType> for FusionReactor {
-    fn into(self) -> ReactorType {
-        ReactorType::Fusion(self)
+impl Into<Reactor> for FusionReactor {
+    fn into(self) -> Reactor {
+        Reactor::Fusion(self)
     }
 }
 
-impl Into<ReactorType> for AntimatterReactor {
-    fn into(self) -> ReactorType {
-        ReactorType::Antimatter(self)
+impl Into<Reactor> for AntimatterReactor {
+    fn into(self) -> Reactor {
+        Reactor::Antimatter(self)
+    }
+}
+
+impl Reactor {
+    pub fn get_mass(&self) -> i32 {
+        match self {
+            Reactor::Fusion(_) => 300,
+            Reactor::Antimatter(_) => 450,
+        }
+    }
+
+    pub fn get_power_output(&self) -> i32 {
+        match self {
+            Reactor::Fusion(_) => 1000,
+            Reactor::Antimatter(_) => 1000,
+        }
     }
 }

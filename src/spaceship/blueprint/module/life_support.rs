@@ -18,53 +18,41 @@ impl AdvancedLifeSupport {
     }
 }
 
-pub trait LifeSupport {
-    fn get_type(&self) -> &'static str;
+pub trait LifeSupportConstraint {}
 
-    fn get_slot_cost(&self) -> i32 {
-        2
-    }
+impl LifeSupportConstraint for StandardLifeSupport {}
 
-    fn get_mass(&self) -> i32;
+impl LifeSupportConstraint for AdvancedLifeSupport {}
 
-    fn get_power_draw(&self) -> i32 {
-        75
-    }
-}
-
-impl LifeSupport for StandardLifeSupport {
-    fn get_type(&self) -> &'static str {
-        "Standard"
-    }
-
-    fn get_mass(&self) -> i32 {
-        80
-    }
-}
-
-impl LifeSupport for AdvancedLifeSupport {
-    fn get_type(&self) -> &'static str {
-        "Advanced"
-    }
-
-    fn get_mass(&self) -> i32 {
-        70
-    }
-}
-
-pub enum LifeSupportType {
+pub enum LifeSupport {
     Standard(StandardLifeSupport),
     Advanced(AdvancedLifeSupport),
 }
 
-impl Into<LifeSupportType> for StandardLifeSupport {
-    fn into(self) -> LifeSupportType {
-        LifeSupportType::Standard(self)
+impl Into<LifeSupport> for StandardLifeSupport {
+    fn into(self) -> LifeSupport {
+        LifeSupport::Standard(self)
     }
 }
 
-impl Into<LifeSupportType> for AdvancedLifeSupport {
-    fn into(self) -> LifeSupportType {
-        LifeSupportType::Advanced(self)
+impl Into<LifeSupport> for AdvancedLifeSupport {
+    fn into(self) -> LifeSupport {
+        LifeSupport::Advanced(self)
+    }
+}
+
+impl LifeSupport {
+    pub fn get_mass(&self) -> i32 {
+        match self {
+            LifeSupport::Standard(_) => 80,
+            LifeSupport::Advanced(_) => 70,
+        }
+    }
+
+    pub fn get_power_draw(&self) -> i32 {
+        match self {
+            LifeSupport::Standard(_) => 50,
+            LifeSupport::Advanced(_) => 50,
+        }
     }
 }

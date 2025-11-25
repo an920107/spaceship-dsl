@@ -18,53 +18,41 @@ impl AdvancedSensors {
     }
 }
 
-pub trait Sensors {
-    fn get_type(&self) -> &'static str;
+pub trait SensorsConstraint {}
 
-    fn get_slot_cost(&self) -> i32 {
-        1
-    }
+impl SensorsConstraint for BasicSensors {}
 
-    fn get_mass(&self) -> i32;
+impl SensorsConstraint for AdvancedSensors {}
 
-    fn get_power_draw(&self) -> i32 {
-        50
-    }
-}
-
-impl Sensors for BasicSensors {
-    fn get_type(&self) -> &'static str {
-        "Basic"
-    }
-
-    fn get_mass(&self) -> i32 {
-        30
-    }
-}
-
-impl Sensors for AdvancedSensors {
-    fn get_type(&self) -> &'static str {
-        "Advanced"
-    }
-
-    fn get_mass(&self) -> i32 {
-        35
-    }
-}
-
-pub enum SensorsType {
+pub enum Sensors {
     Basic(BasicSensors),
     Advanced(AdvancedSensors),
 }
 
-impl Into<SensorsType> for BasicSensors {
-    fn into(self) -> SensorsType {
-        SensorsType::Basic(self)
+impl Into<Sensors> for BasicSensors {
+    fn into(self) -> Sensors {
+        Sensors::Basic(self)
     }
 }
 
-impl Into<SensorsType> for AdvancedSensors {
-    fn into(self) -> SensorsType {
-        SensorsType::Advanced(self)
+impl Into<Sensors> for AdvancedSensors {
+    fn into(self) -> Sensors {
+        Sensors::Advanced(self)
+    }
+}
+
+impl Sensors {
+    pub fn get_mass(&self) -> i32 {
+        match self {
+            Sensors::Basic(_) => 30,
+            Sensors::Advanced(_) => 35,
+        }
+    }
+
+    pub fn get_power_draw(&self) -> i32 {
+        match self {
+            Sensors::Basic(_) => 50,
+            Sensors::Advanced(_) => 50,
+        }
     }
 }

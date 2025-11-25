@@ -1,4 +1,4 @@
-const TOTAL_SLOTS: usize = 10;
+pub const TOTAL_SLOTS: usize = 10;
 
 pub struct SlotCheck<const N: usize, const C: usize>;
 

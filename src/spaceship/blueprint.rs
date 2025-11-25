@@ -3,12 +3,12 @@ use std::marker::PhantomData;
 use crate::spaceship::blueprint::{
     module::{
         HasModule, No, Yes,
-        bridge::{Bridge, BridgeType},
-        engine::{Engine, EngineType},
-        life_support::{LifeSupport, LifeSupportType},
-        reactor::{Reactor, ReactorType},
-        sensors::{Sensors, SensorsType},
-        shield::{Shield, ShieldType},
+        bridge::{Bridge, BridgeConstraint},
+        engine::{Engine, EngineConstraint},
+        life_support::{LifeSupport, LifeSupportConstraint},
+        reactor::{Reactor, ReactorConstraint},
+        sensors::{Sensors, SensorsConstraint},
+        shield::{Shield, ShieldConstraint},
     },
     slot::{SlotCheck, SlotIsAvailable},
     stage::{
@@ -22,12 +22,12 @@ mod slot;
 mod stage;
 
 pub struct Blueprint<S: Stage, const N: usize, FR: HasModule, AR: HasModule> {
-    reactors: Option<Vec<ReactorType>>,
-    engine: Option<EngineType>,
-    life_support: Option<LifeSupportType>,
-    bridge: Option<BridgeType>,
-    shield: Option<ShieldType>,
-    sensors: Option<SensorsType>,
+    reactors: Option<Vec<Reactor>>,
+    engine: Option<Engine>,
+    life_support: Option<LifeSupport>,
+    bridge: Option<Bridge>,
+    shield: Option<Shield>,
+    sensors: Option<Sensors>,
     _stage: PhantomData<(S, FR, AR)>,
 }
 
@@ -74,7 +74,7 @@ impl<
         reactor: T,
     ) -> Blueprint<CoreModulesInstallationStage<Yes, E, L, B>, { N + 3 }, T::NewFR, T::NewAR>
     where
-        T: Reactor<N, FR, AR> + Into<ReactorType>,
+        T: ReactorConstraint<N, FR, AR> + Into<Reactor>,
         SlotCheck<N, 3>: SlotIsAvailable,
     {
         if let Some(reactors) = self.reactors.as_mut() {
@@ -100,7 +100,7 @@ impl<const N: usize, R: HasModule, L: HasModule, B: HasModule, FR: HasModule, AR
         engine: T,
     ) -> Blueprint<CoreModulesInstallationStage<R, Yes, L, B>, { N + 2 }, FR, AR>
     where
-        T: Engine + Into<EngineType>,
+        T: EngineConstraint + Into<Engine>,
         SlotCheck<N, 2>: SlotIsAvailable,
     {
         Blueprint {
@@ -123,7 +123,7 @@ impl<const N: usize, R: HasModule, E: HasModule, B: HasModule, FR: HasModule, AR
         life_support: T,
     ) -> Blueprint<CoreModulesInstallationStage<R, E, Yes, B>, { N + 2 }, FR, AR>
     where
-        T: LifeSupport + Into<LifeSupportType>,
+        T: LifeSupportConstraint + Into<LifeSupport>,
         SlotCheck<N, 2>: SlotIsAvailable,
     {
         Blueprint {
@@ -146,7 +146,7 @@ impl<const N: usize, R: HasModule, E: HasModule, L: HasModule, FR: HasModule, AR
         bridge: T,
     ) -> Blueprint<CoreModulesInstallationStage<R, E, L, Yes>, { N + 1 }, FR, AR>
     where
-        T: Bridge + Into<BridgeType>,
+        T: BridgeConstraint + Into<Bridge>,
         SlotCheck<N, 1>: SlotIsAvailable,
     {
         Blueprint {
@@ -187,7 +187,7 @@ impl<const N: usize, E: HasModule, FR: HasModule, AR: HasModule>
         shield: T,
     ) -> Blueprint<OptionalModulesInstallationStage<Yes, E>, { N + 1 }, FR, AR>
     where
-        T: Shield<FR, AR> + Into<ShieldType>,
+        T: ShieldConstraint<FR, AR> + Into<Shield>,
         SlotCheck<N, 1>: SlotIsAvailable,
     {
         Blueprint {
@@ -210,7 +210,7 @@ impl<const N: usize, H: HasModule, FR: HasModule, AR: HasModule>
         sensors: T,
     ) -> Blueprint<OptionalModulesInstallationStage<H, Yes>, { N + 1 }, FR, AR>
     where
-        T: Sensors + Into<SensorsType>,
+        T: SensorsConstraint + Into<Sensors>,
         SlotCheck<N, 1>: SlotIsAvailable,
     {
         Blueprint {
@@ -238,5 +238,66 @@ impl<const N: usize, H: HasModule, E: HasModule, FR: HasModule, AR: HasModule>
             sensors: self.sensors,
             _stage: PhantomData,
         }
+    }
+}
+
+impl<const N: usize, FR: HasModule, AR: HasModule> Blueprint<FinalizationStage, N, FR, AR> {
+    pub fn print_spec(&self) {
+        println!("Spaceship Blueprint Specification:");
+        println!("====== Slots ======");
+        println!("Total slots: {}", slot::TOTAL_SLOTS);
+        println!("Used slots: {}", N);
+        println!("Available slots: {}", slot::TOTAL_SLOTS - N);
+        println!("====== Power ======");
+        println!("Total Power Output: {}", self.get_power_output());
+        println!("Total Power Consumption: {}", self.get_power_draw());
+        println!(
+            "Power Balance: {}",
+            self.get_power_output() - self.get_power_draw()
+        );
+        println!("====== Load ======");
+        println!(
+            "Thrust-to-Weight Ratio: {}",
+            if self.get_mass() > 0 {
+                self.get_thrust() as f32 / self.get_mass() as f32
+            } else {
+                0.0
+            }
+        );
+        println!();
+    }
+
+    fn get_power_output(&self) -> i32 {
+        match &self.reactors {
+            Some(reactors) => reactors.iter().map(|r| r.get_power_output()).sum(),
+            None => 0,
+        }
+    }
+
+    fn get_power_draw(&self) -> i32 {
+        self.engine.as_ref().map_or(0, |e| e.get_power_draw())
+            + self
+                .life_support
+                .as_ref()
+                .map_or(0, |ls| ls.get_power_draw())
+            + self.bridge.as_ref().map_or(0, |b| b.get_power_draw())
+            + self.shield.as_ref().map_or(0, |s| s.get_power_draw())
+            + self.sensors.as_ref().map_or(0, |s| s.get_power_draw())
+    }
+
+    fn get_mass(&self) -> i32 {
+        self.engine.as_ref().map_or(0, |e| e.get_mass())
+            + self.life_support.as_ref().map_or(0, |ls| ls.get_mass())
+            + self.bridge.as_ref().map_or(0, |b| b.get_mass())
+            + self.shield.as_ref().map_or(0, |s| s.get_mass())
+            + self.sensors.as_ref().map_or(0, |s| s.get_mass())
+            + match &self.reactors {
+                Some(reactors) => reactors.iter().map(|r| r.get_mass()).sum(),
+                None => 0,
+            }
+    }
+
+    fn get_thrust(&self) -> i32 {
+        self.engine.as_ref().map_or(0, |e| e.get_thrust())
     }
 }
