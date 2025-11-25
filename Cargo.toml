@@ -1,6 +1,11 @@
-[package]
-name = "spaceship"
+[workspace]
+members = ["spaceship", "example"]
+resolver = "2"
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
 
-[dependencies]
+[workspace.dependencies]
+spaceship.path = "spaceship"
+example.path = "example"

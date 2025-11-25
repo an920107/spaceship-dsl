@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use crate::spaceship::blueprint::{
+use crate::blueprint::{
     module::{
         HasModule, No, Yes,
         bridge::{Bridge, BridgeConstraint},
@@ -20,6 +20,8 @@ use crate::spaceship::blueprint::{
 pub mod module;
 mod slot;
 mod stage;
+
+pub type FinalizedBlueprint<const N: usize, FR, AR> = Blueprint<FinalizationStage, N, FR, AR>;
 
 pub struct Blueprint<S: Stage, const N: usize, FR: HasModule, AR: HasModule> {
     reactors: Option<Vec<Reactor>>,
@@ -256,6 +258,8 @@ impl<const N: usize, FR: HasModule, AR: HasModule> Blueprint<FinalizationStage, 
             self.get_power_output() - self.get_power_draw()
         );
         println!("====== Load ======");
+        println!("Total Mass: {}", self.get_mass());
+        println!("Total Thrust: {}", self.get_thrust());
         println!(
             "Thrust-to-Weight Ratio: {}",
             if self.get_mass() > 0 {

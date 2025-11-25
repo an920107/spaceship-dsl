@@ -1,0 +1,6 @@
+[package]
+name = "spaceship"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

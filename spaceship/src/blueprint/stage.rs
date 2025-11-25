@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use crate::spaceship::blueprint::module::HasModule;
+use crate::blueprint::module::HasModule;
 
 pub struct InitialStage;
 pub struct CoreModulesInstallationStage<R: HasModule, E: HasModule, L: HasModule, B: HasModule>(

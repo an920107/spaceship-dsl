@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use crate::spaceship::blueprint::module::{HasModule, No};
+use crate::blueprint::module::{HasModule, No};
 
 #[derive(Clone, Copy)]
 pub struct MagneticShield(PhantomData<()>);

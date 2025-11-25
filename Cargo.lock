@@ -3,5 +3,12 @@
 version = 4
 
 [[package]]
+name = "example"
+version = "0.1.0"
+dependencies = [
+ "spaceship",
+]
+
+[[package]]
 name = "spaceship"
 version = "0.1.0"
