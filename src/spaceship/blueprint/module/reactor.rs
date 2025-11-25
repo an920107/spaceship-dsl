@@ -20,15 +20,11 @@ impl AntimatterReactor {
     }
 }
 
-pub trait Reactor<FR: HasModule, AR: HasModule> {
+pub trait Reactor<const N: usize, FR: HasModule, AR: HasModule> {
     type NewFR: HasModule;
     type NewAR: HasModule;
 
     fn get_type(&self) -> &'static str;
-
-    fn get_slot_cost(&self) -> i32 {
-        3
-    }
 
     fn get_mass(&self) -> i32;
 
@@ -37,7 +33,7 @@ pub trait Reactor<FR: HasModule, AR: HasModule> {
     }
 }
 
-impl<FR: HasModule, AR: HasModule> Reactor<FR, AR> for FusionReactor {
+impl<const N: usize, FR: HasModule, AR: HasModule> Reactor<N, FR, AR> for FusionReactor {
     type NewFR = Yes;
     type NewAR = AR;
 
@@ -50,7 +46,7 @@ impl<FR: HasModule, AR: HasModule> Reactor<FR, AR> for FusionReactor {
     }
 }
 
-impl<FR: HasModule, AR: HasModule> Reactor<FR, AR> for AntimatterReactor {
+impl<const N: usize, FR: HasModule, AR: HasModule> Reactor<N, FR, AR> for AntimatterReactor {
     type NewFR = FR;
     type NewAR = Yes;
 
