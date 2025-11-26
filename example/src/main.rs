@@ -9,13 +9,13 @@ use spaceship::{
 fn main() {
     let spaceship = create_spaceship!(
         core {
-            add_reactor(AntimatterReactor::new());
-            add_bridge(CommandBridge::new());
-            add_life_support(AdvancedLifeSupport::new());
-            add_engine(IonEngine::new());
+            reactor AntimatterReactor,
+            engine IonEngine,
+            life_support AdvancedLifeSupport,
+            bridge CommandBridge,
         }
         optional {
-            add_shield(PhaseShield::new());
+            shield PhaseShield,
         }
     );
 
