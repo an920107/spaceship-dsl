@@ -2,6 +2,8 @@ use std::marker::PhantomData;
 
 use crate::blueprint::module::HasModule;
 
+pub mod check;
+
 pub struct InitialStage;
 pub struct CoreModulesInstallationStage<R: HasModule, E: HasModule, L: HasModule, B: HasModule>(
     PhantomData<(R, E, L, B)>,

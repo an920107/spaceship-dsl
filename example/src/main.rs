@@ -1,7 +1,7 @@
 use spaceship::{
     blueprint::module::{
         bridge::CommandBridge, engine::IonEngine, life_support::AdvancedLifeSupport,
-        reactor::AntimatterReactor, shield::PhaseShield,
+        reactor::AntimatterReactor, sensors::AdvancedSensors, shield::PhaseShield,
     },
     create_spaceship,
 };
@@ -9,13 +9,14 @@ use spaceship::{
 fn main() {
     let spaceship = create_spaceship!(
         core {
-            reactor AntimatterReactor,
             engine IonEngine,
+            reactor AntimatterReactor,
             life_support AdvancedLifeSupport,
             bridge CommandBridge,
         }
         optional {
             shield PhaseShield,
+            sensors AdvancedSensors,
         }
     );
 

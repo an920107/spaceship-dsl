@@ -1,13 +1,14 @@
 pub const TOTAL_SLOTS: usize = 10;
 
-pub struct SlotCheck<const N: usize, const C: usize>;
+#[diagnostic::on_unimplemented(message = "cannot add component: slot limit exceeded")]
+trait IsTrue {}
 
 struct Check<const B: bool>;
-trait IsTrue {}
 impl IsTrue for Check<true> {}
 
-pub trait SlotIsAvailable {}
-impl<const N: usize, const C: usize> SlotIsAvailable for SlotCheck<N, C> where
-    Check<{ N + C <= TOTAL_SLOTS }>: IsTrue
+pub trait SlotIsAvailable<const N: usize, const C: usize> {}
+impl<const N: usize, const C: usize> SlotIsAvailable<N, C> for ()
+where
+    Check<{ N + C <= TOTAL_SLOTS }>: IsTrue,
 {
 }

@@ -10,10 +10,14 @@ use crate::blueprint::{
         sensors::{Sensors, SensorsConstraint},
         shield::{Shield, ShieldConstraint},
     },
-    slot::{SlotCheck, SlotIsAvailable},
+    slot::SlotIsAvailable,
     stage::{
         CoreModulesInstallationStage, FinalizationStage, InitialStage,
         OptionalModulesInstallationStage, Stage,
+        check::{
+            AllCoreModulesInstalled, NoBridgeInstalled, NoEngineInstalled, NoLifeSupportInstalled,
+            NoSensorsInstalled, NoShieldInstalled,
+        },
     },
 };
 
@@ -77,7 +81,7 @@ impl<
     ) -> Blueprint<CoreModulesInstallationStage<Yes, E, L, B>, { N + 3 }, T::NewFR, T::NewAR>
     where
         T: ReactorConstraint<N, FR, AR> + Into<Reactor>,
-        SlotCheck<N, 3>: SlotIsAvailable,
+        (): SlotIsAvailable<N, 3>,
     {
         if let Some(reactors) = self.reactors.as_mut() {
             reactors.push(reactor.into());
@@ -92,18 +96,14 @@ impl<
             _stage: PhantomData,
         }
     }
-}
 
-impl<const N: usize, R: HasModule, L: HasModule, B: HasModule, FR: HasModule, AR: HasModule>
-    Blueprint<CoreModulesInstallationStage<R, No, L, B>, N, FR, AR>
-{
     pub fn add_engine<T>(
         self,
         engine: T,
     ) -> Blueprint<CoreModulesInstallationStage<R, Yes, L, B>, { N + 2 }, FR, AR>
     where
         T: EngineConstraint + Into<Engine>,
-        SlotCheck<N, 2>: SlotIsAvailable,
+        (): NoEngineInstalled<E> + SlotIsAvailable<N, 2>,
     {
         Blueprint {
             reactors: self.reactors,
@@ -115,18 +115,14 @@ impl<const N: usize, R: HasModule, L: HasModule, B: HasModule, FR: HasModule, AR
             _stage: PhantomData,
         }
     }
-}
 
-impl<const N: usize, R: HasModule, E: HasModule, B: HasModule, FR: HasModule, AR: HasModule>
-    Blueprint<CoreModulesInstallationStage<R, E, No, B>, N, FR, AR>
-{
     pub fn add_life_support<T>(
         self,
         life_support: T,
     ) -> Blueprint<CoreModulesInstallationStage<R, E, Yes, B>, { N + 2 }, FR, AR>
     where
         T: LifeSupportConstraint + Into<LifeSupport>,
-        SlotCheck<N, 2>: SlotIsAvailable,
+        (): NoLifeSupportInstalled<L> + SlotIsAvailable<N, 2>,
     {
         Blueprint {
             reactors: self.reactors,
@@ -138,18 +134,14 @@ impl<const N: usize, R: HasModule, E: HasModule, B: HasModule, FR: HasModule, AR
             _stage: PhantomData,
         }
     }
-}
 
-impl<const N: usize, R: HasModule, E: HasModule, L: HasModule, FR: HasModule, AR: HasModule>
-    Blueprint<CoreModulesInstallationStage<R, E, L, No>, N, FR, AR>
-{
     pub fn add_bridge<T>(
         self,
         bridge: T,
     ) -> Blueprint<CoreModulesInstallationStage<R, E, L, Yes>, { N + 1 }, FR, AR>
     where
         T: BridgeConstraint + Into<Bridge>,
-        SlotCheck<N, 1>: SlotIsAvailable,
+        (): NoBridgeInstalled<B> + SlotIsAvailable<N, 1>,
     {
         Blueprint {
             reactors: self.reactors,
@@ -161,14 +153,11 @@ impl<const N: usize, R: HasModule, E: HasModule, L: HasModule, FR: HasModule, AR
             _stage: PhantomData,
         }
     }
-}
 
-impl<const N: usize, FR: HasModule, AR: HasModule>
-    Blueprint<CoreModulesInstallationStage<Yes, Yes, Yes, Yes>, N, FR, AR>
-{
-    pub fn lock_core_modules(
-        self,
-    ) -> Blueprint<OptionalModulesInstallationStage<No, No>, N, FR, AR> {
+    pub fn lock_core_modules(self) -> Blueprint<OptionalModulesInstallationStage<No, No>, N, FR, AR>
+    where
+        (): AllCoreModulesInstalled<R, E, L, B>,
+    {
         Blueprint {
             reactors: self.reactors,
             engine: self.engine,
@@ -181,8 +170,8 @@ impl<const N: usize, FR: HasModule, AR: HasModule>
     }
 }
 
-impl<const N: usize, E: HasModule, FR: HasModule, AR: HasModule>
-    Blueprint<OptionalModulesInstallationStage<No, E>, N, FR, AR>
+impl<const N: usize, H: HasModule, E: HasModule, FR: HasModule, AR: HasModule>
+    Blueprint<OptionalModulesInstallationStage<H, E>, N, FR, AR>
 {
     pub fn add_shield<T>(
         self,
@@ -190,7 +179,7 @@ impl<const N: usize, E: HasModule, FR: HasModule, AR: HasModule>
     ) -> Blueprint<OptionalModulesInstallationStage<Yes, E>, { N + 1 }, FR, AR>
     where
         T: ShieldConstraint<FR, AR> + Into<Shield>,
-        SlotCheck<N, 1>: SlotIsAvailable,
+        (): NoShieldInstalled<H> + SlotIsAvailable<N, 1>,
     {
         Blueprint {
             reactors: self.reactors,
@@ -202,18 +191,14 @@ impl<const N: usize, E: HasModule, FR: HasModule, AR: HasModule>
             _stage: PhantomData,
         }
     }
-}
 
-impl<const N: usize, H: HasModule, FR: HasModule, AR: HasModule>
-    Blueprint<OptionalModulesInstallationStage<H, No>, N, FR, AR>
-{
     pub fn add_sensors<T>(
         self,
         sensors: T,
     ) -> Blueprint<OptionalModulesInstallationStage<H, Yes>, { N + 1 }, FR, AR>
     where
         T: SensorsConstraint + Into<Sensors>,
-        SlotCheck<N, 1>: SlotIsAvailable,
+        (): NoSensorsInstalled<E> + SlotIsAvailable<N, 1>,
     {
         Blueprint {
             reactors: self.reactors,
@@ -225,11 +210,7 @@ impl<const N: usize, H: HasModule, FR: HasModule, AR: HasModule>
             _stage: PhantomData,
         }
     }
-}
 
-impl<const N: usize, H: HasModule, E: HasModule, FR: HasModule, AR: HasModule>
-    Blueprint<OptionalModulesInstallationStage<H, E>, N, FR, AR>
-{
     pub fn finalize(self) -> Blueprint<FinalizationStage, N, FR, AR> {
         Blueprint {
             reactors: self.reactors,

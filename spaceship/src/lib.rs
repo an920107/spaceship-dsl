@@ -51,5 +51,4 @@ macro_rules! create_spaceship {
     (@optional ($expr:expr)) => {
         $expr.finalize() as $crate::blueprint::FinalizedBlueprint<_, _, _>
     };
-
 }

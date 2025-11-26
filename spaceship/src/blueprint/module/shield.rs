@@ -20,6 +20,9 @@ impl PhaseShield {
     }
 }
 
+#[diagnostic::on_unimplemented(
+    message = "cannot add shield: shield type is incompatible with the current reactor"
+)]
 pub trait ShieldConstraint<FR: HasModule, AR: HasModule> {}
 
 impl<FR: HasModule> ShieldConstraint<FR, No> for MagneticShield {}
