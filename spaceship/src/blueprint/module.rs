@@ -4,6 +4,7 @@ pub mod life_support;
 pub mod reactor;
 pub mod sensors;
 pub mod shield;
+pub mod frame;
 
 #[derive(Debug, Clone)]
 pub struct Yes;
