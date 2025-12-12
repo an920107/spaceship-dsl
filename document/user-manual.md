@@ -94,18 +94,16 @@ use spaceship::create_spaceship;
 
 fn main() {
     let spaceship = create_spaceship!(
-        // Define core modules here
-        core {
-            engine IonEngine,
-            reactor AntimatterReactor,
-            life_support AdvancedLifeSupport,
-            bridge CommandBridge,
-        }
-        // Define optional modules here
-        optional {
-            shield PhaseShield,
-            sensors AdvancedSensors,
-        }
+      core {
+         reactor FusionReactor | AntimatterReactor,
+         engine IonEngine | PlasmaEngine,
+         life_support StandardLifeSupport | AdvancedLifeSupport,
+         bridge ExplorerBridge | CommandBridge,
+      }
+      optional {
+         shield MagneticShield | PhaseShield,
+         sensors BasicSensors | AdvancedSensors,
+      }
     );
 
     spaceship.print_spec();
