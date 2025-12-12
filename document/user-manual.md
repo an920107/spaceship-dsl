@@ -80,6 +80,8 @@ macro acts as the entry point for your blueprint definition.
 You will specify your core and optional modules within two distinct blocks:
 `core { ... }` and `optional { ... }`.
 
+**_Check `example/src/main.rs` file._**
+
 Here's the basic structure:
 
 ```rust
