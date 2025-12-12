@@ -56,8 +56,7 @@ Once Rust is installed, navigating to your project directory and running your
 spaceship design is straightforward:
 
 1. Open your terminal or command prompt.
-2. Navigate to the root directory of your Rust project where your `Cargo.toml`
-   file is located.
+2. Navigate to the root directory of your Rust project where your `Cargo.toml` and `Cargo.lock` files are located.
 3. Execute your program using Cargo:
 
    ```bash
