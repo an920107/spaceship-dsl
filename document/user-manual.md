@@ -48,6 +48,8 @@ Code.
 
 This extension provide the bundle of rust extensions for better development.
 
+![alt text](image.png)
+
 ## 2. How to Run Your Program
 
 Once Rust is installed, navigating to your project directory and running your
