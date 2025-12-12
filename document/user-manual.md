@@ -18,11 +18,13 @@ If you don't already have Rust and Cargo installed, you can do so using
 `rustup`, the Rust toolchain installer:
 
 1. Open your terminal or command prompt.
-2. Run the following command:
+2. Run the following command for `macOS`, `Linux`, or another `Unix-like OS`:
 
    ```bash
    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
    ```
+
+   **_If you're on windows, pls follow the instruction on the [official page](https://rust-lang.org/learn/get-started/)_**.
 
 3. Follow the on-screen instructions. This will install `rustc` (the Rust
    compiler) and `cargo` (the Rust package manager).
