@@ -95,19 +95,32 @@ use spaceship::create_spaceship;
 fn main() {
     let spaceship = create_spaceship!(
       core {
-         reactor FusionReactor | AntimatterReactor,
-         engine IonEngine | PlasmaEngine,
-         life_support StandardLifeSupport | AdvancedLifeSupport,
-         bridge ExplorerBridge | CommandBridge,
+         reactor (FusionReactor | AntimatterReactor) // choose one of these,
+         engine (IonEngine | PlasmaEngine) // choose one of these,
+         life_support (StandardLifeSupport | AdvancedLifeSupport) // choose one of these,
+         bridge (ExplorerBridge | CommandBridge) // choose one of these,
       }
       optional {
-         shield MagneticShield | PhaseShield,
-         sensors BasicSensors | AdvancedSensors,
+         shield (MagneticShield | PhaseShield) // choose one of these,
+         sensors (BasicSensors | AdvancedSensors) // choose one of these,
       }
     );
 
     spaceship.print_spec();
 }
+```
+
+To add more modules for a type, just write something like below:
+
+```rust
+...
+core {
+   reactor FusionReactor,
+   reactor AntimatterReactor,
+   reactor AntimatterReactor,
+   ...
+}
+...
 ```
 
 ### 3.2 Compile-Time Safety Checks (Correct by Construction - CBC)
